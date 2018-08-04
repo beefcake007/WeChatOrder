@@ -8,6 +8,9 @@ import com.fanye.sell.exception.SellException;
 import com.fanye.sell.repository.ProductInfoRepository;
 import com.fanye.sell.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,12 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+//@CacheConfig(cacheNames = "product")
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductInfoRepository repository;
 
     @Override
+//    @Cacheable(cacheNames = "product", key = "123")
+//    @Cacheable(key = "singleDog")
     public ProductInfo findById(String productId) {
         try{
             ProductInfo productInfo = repository.findById(productId).get();
@@ -42,6 +48,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+//    @CachePut(cacheNames = "product", key = "123")
+//    @CachePut(key = "singleDog")
     public ProductInfo save(ProductInfo productInfo) {
         return repository.save(productInfo);
     }
