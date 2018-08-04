@@ -23,7 +23,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductInfo findById(String productId) {
-        return repository.findById(productId).get();
+        try{
+            ProductInfo productInfo = repository.findById(productId).get();
+            return productInfo;
+        }catch (Exception e){
+            throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
+        }
     }
 
     @Override
@@ -44,8 +49,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void increaseStock(List<CartDTO> cartDTOList) {
         for (CartDTO cartDTO : cartDTOList) {
-            ProductInfo productInfo = repository.findById(cartDTO.getProductId()).get();
-            if (productInfo == null) {
+            ProductInfo productInfo;
+            try{
+                productInfo = repository.findById(cartDTO.getProductId()).get();
+            }catch (Exception e){
                 throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
             }
             Integer result = productInfo.getProductStock() + cartDTO.getProductQuantity();
@@ -58,8 +65,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void decreaseStock(List<CartDTO> cartDTOList) {
         for (CartDTO cartDTO : cartDTOList) {
-            ProductInfo productInfo = repository.findById(cartDTO.getProductId()).get();
-            if (productInfo == null) {
+            ProductInfo productInfo;
+            try{
+                productInfo = repository.findById(cartDTO.getProductId()).get();
+            }catch (Exception e){
                 throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
             }
 
@@ -73,4 +82,41 @@ public class ProductServiceImpl implements ProductService {
             repository.save(productInfo);
         }
     }
+
+    @Override
+    public ProductInfo onSale(String productId) {
+        ProductInfo productInfo;
+        try{
+            productInfo = repository.findById(productId).get();
+        }catch (Exception e){
+            throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
+        }
+
+        if (productInfo.getProductStatusEnum() == ProductStatusEnum.UP) {
+            throw new SellException(ResultEnum.PRODUCT_STATUS_ERROR);
+        }
+
+        //更新
+        productInfo.setProductStatus(ProductStatusEnum.UP.getCode());
+        return repository.save(productInfo);
+    }
+
+    @Override
+    public ProductInfo offSale(String productId) {
+        ProductInfo productInfo;
+        try{
+            productInfo = repository.findById(productId).get();
+        }catch (Exception e){
+            throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
+        }
+
+        if (productInfo.getProductStatusEnum() == ProductStatusEnum.DOWN) {
+            throw new SellException(ResultEnum.PRODUCT_STATUS_ERROR);
+        }
+
+        //更新
+        productInfo.setProductStatus(ProductStatusEnum.DOWN.getCode());
+        return repository.save(productInfo);
+    }
+
 }

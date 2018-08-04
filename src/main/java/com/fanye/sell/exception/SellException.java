@@ -1,7 +1,9 @@
 package com.fanye.sell.exception;
 
 import com.fanye.sell.enums.ResultEnum;
+import lombok.Getter;
 
+@Getter
 public class SellException extends RuntimeException {
 
     private Integer code;

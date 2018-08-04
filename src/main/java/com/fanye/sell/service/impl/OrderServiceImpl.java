@@ -14,6 +14,7 @@ import com.fanye.sell.repository.OrderDetailRepository;
 import com.fanye.sell.repository.OrderMasterRepository;
 import com.fanye.sell.service.OrderService;
 import com.fanye.sell.service.ProductService;
+import com.fanye.sell.service.WebSocket;
 import com.fanye.sell.utils.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -42,6 +43,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderMasterRepository orderMasterRepository;
+
+    @Autowired
+    private WebSocket webSocket;
 
     @Override
     @Transactional
@@ -78,13 +82,19 @@ public class OrderServiceImpl implements OrderService {
         List<CartDTO> cartDTOList = orderDTO.getOrderDetailList().stream().map(e ->
                 new CartDTO(e.getProductId(), e.getProductQuantity())).collect(Collectors.toList());
         productService.decreaseStock(cartDTOList);
+
+        //发送websocket消息
+        webSocket.sendMessage(orderDTO.getOrderId());
+
         return orderDTO;
     }
 
     @Override
     public OrderDTO findById(String orderId) {
-        OrderMaster orderMaster = orderMasterRepository.findById(orderId).get();
-        if (orderMaster == null) {
+        OrderMaster orderMaster;
+        try {
+            orderMaster = orderMasterRepository.findById(orderId).get();
+        } catch (Exception e) {
             throw new SellException(ResultEnum.ORDER_NOT_EXIST);
         }
 
@@ -175,8 +185,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //判断支付状态
-        if (!orderDTO.getPayStatus().equals(PayStatusEnum.WAIT.getCode())){
-            log.error("【订单支付】订单支付状态不正确，orderDTO={}",orderDTO);
+        if (!orderDTO.getPayStatus().equals(PayStatusEnum.WAIT.getCode())) {
+            log.error("【订单支付】订单支付状态不正确，orderDTO={}", orderDTO);
             throw new SellException(ResultEnum.ORDER_PAY_STATUS_ERROR);
         }
 
@@ -190,5 +200,14 @@ public class OrderServiceImpl implements OrderService {
             throw new SellException(ResultEnum.ORDER_UPDATE_FAIL);
         }
         return orderDTO;
+    }
+
+    @Override
+    public Page<OrderDTO> findList(Pageable pageable) {
+        Page<OrderMaster> orderMasterPage = orderMasterRepository.findAll(pageable);
+
+        List<OrderDTO> orderDTOList = OrderMaster2OrderDTOConverter.convert(orderMasterPage.getContent());
+
+        return new PageImpl<>(orderDTOList, pageable, orderMasterPage.getTotalElements());
     }
 }

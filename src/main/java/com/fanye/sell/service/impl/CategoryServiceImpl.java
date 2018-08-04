@@ -1,6 +1,8 @@
 package com.fanye.sell.service.impl;
 
 import com.fanye.sell.dataobject.ProductCategory;
+import com.fanye.sell.enums.ResultEnum;
+import com.fanye.sell.exception.SellException;
 import com.fanye.sell.repository.ProductCategoryRepository;
 import com.fanye.sell.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ProductCategory findById(Integer categoryId) {
-        return repository.findById(categoryId).get();
+        try{
+            ProductCategory productCategory  = repository.findById(categoryId).get();
+            return productCategory;
+        }catch (Exception e){
+            throw new SellException(ResultEnum.PRODUCT_CATEGORY_NOT_EXIST);
+        }
+
     }
 
     @Override

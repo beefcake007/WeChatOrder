@@ -26,21 +26,21 @@ public class ProductServiceImplTest {
     @Test
     public void findById() {
         ProductInfo productInfo = productService.findById("123456");
-        Assert.assertEquals("123456",productInfo.getProductId());
+        Assert.assertEquals("123456", productInfo.getProductId());
     }
 
     @Test
     public void findUpAll() {
-        List<ProductInfo> productInfoList  = productService.findUpAll();
-        Assert.assertNotEquals(0,productInfoList.size());
+        List<ProductInfo> productInfoList = productService.findUpAll();
+        Assert.assertNotEquals(0, productInfoList.size());
     }
 
     @Test
     public void findAll() {
-        PageRequest request = new PageRequest(0,2);
+        PageRequest request = PageRequest.of(0, 2);
         Page<ProductInfo> productInfoPage = productService.findAll(request);
 //        System.out.println(productInfoPage.getTotalElements());
-        Assert.assertNotEquals(0,productInfoPage.getTotalElements());
+        Assert.assertNotEquals(0, productInfoPage.getTotalElements());
     }
 
     @Test
@@ -57,5 +57,17 @@ public class ProductServiceImplTest {
 
         ProductInfo result = productService.save(productInfo);
         Assert.assertNotNull(result);
+    }
+
+    @Test
+    public void onSale() {
+        ProductInfo result = productService.onSale("123456");
+        Assert.assertEquals(ProductStatusEnum.UP, result.getProductStatusEnum());
+    }
+
+    @Test
+    public void offSale() {
+        ProductInfo result = productService.offSale("123456");
+        Assert.assertEquals(ProductStatusEnum.DOWN, result.getProductStatusEnum());
     }
 }

@@ -5,7 +5,15 @@ import lombok.Getter;
 @Getter
 public enum ResultEnum {
 
+    SUCCESS(0, "成功"),
+
     PARAM_ERROR(1, "参数不正确"),
+
+    PRODUCT_OFFSALE_SUCCESS(7, "商品下架成功"),
+
+    PRODUCT_ONSALE_SUCCESS(8, "商品上架成功"),
+
+    PRODUCT_STATUS_ERROR(9, "商品状态不正确"),
 
     PRODUCT_NOT_EXIST(10, "商品不存在"),
 
@@ -25,7 +33,17 @@ public enum ResultEnum {
 
     CARY_EMPTY(18, "购物车为空"),
 
-    ORDER_OWNER_ERROR(19, "该订单不属于当前用户");
+    ORDER_OWNER_ERROR(19, "该订单不属于当前用户"),
+
+    ORDER_CANCEL_SUCCESS(22, "订单取消成功"),
+
+    ORDER_FINISH_SUCCESS(23, "订单完结成功"),
+
+    PRODUCT_CATEGORY_NOT_EXIST(24, "商品类别不存在"),
+
+    LOGIN_FAIL(25, "登录失败,登录信息不正确"),
+
+    LOGOUT_SUCCESS(25, "登出成功"),;
 
     private Integer code;
 

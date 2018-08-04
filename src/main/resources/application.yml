@@ -8,6 +8,14 @@ spring:
     show-sql: true
   jackson:
     default-property-inclusion: non_null
+  redis:
+    host: localhost
+    port: 6379
 server:
   servlet:
     context-path: /sell
+logging:
+  level:
+    com.fanye.sell.dataobject.mapper: trace
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
